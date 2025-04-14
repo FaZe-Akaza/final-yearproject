@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Reminders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+     :root {
+    --primary: #555555;
+    --secondary: #333333;
+    --accent: #D4AF37; /* Gold color */
+    --danger: #B22222;
+    --warning: #FFA500;
+    --success: #228B22;
+    --dark: #212529;
+    --light: #f8f9fa;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-image: url('michyv.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    color: #333;
+    line-height: 1.6;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.85);
+    z-index: -1;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--primary);
+}
+
+h1 {
+    color: var(--accent);
+    font-size: 28px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary);
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #8B0000;
+}
+
+.btn-success {
+    background-color: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #006400;
+}
+
+.card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.15);
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.card-header {
+    padding: 15px 20px;
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--accent);
+}
+
+.card-body {
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+tr:hover {
+    background-color: rgba(212, 175, 55, 0.1);
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-success {
+    background-color: #e6f7e6;
+    color: var(--success);
+    border: 1px solid var(--success);
+}
+
+.badge-warning {
+    background-color: #fff8e6;
+    color: var(--warning);
+    border: 1px solid var(--warning);
+}
+
+.badge-danger {
+    background-color: #ffe6e6;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+
+.badge-info {
+    background-color: #e6f2ff;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.action-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+    font-size: 16px;
+    transition: color 0.3s;
+    padding: 4px;
+}
+
+.action-btn:hover {
+    color: var(--accent);
+}
+
+.action-btn.delete:hover {
+    color: var(--danger);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #777;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: var(--accent);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--accent);
+}
+
+.modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--primary);
+    color: white;
+}
+
+.modal-body {
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background-color: #f8f9fa;
+}
+
+.close {
+    font-size: 24px;
+    cursor: pointer;
+    color: #ccc;
+}
+
+.close:hover {
+    color: var(--accent);
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 4px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+.toast.success {
+    background-color: var(--success);
+}
+
+.toast.error {
+    background-color: var(--danger);
+}
+
+.toast.info {
+    background-color: var(--primary);
+}
+
+/* Additional gold accents */
+.card-header, .modal-header, .btn-primary {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-bell"></i> Invoice Reminders</h1>
+            <div>
+                <a href="newinv.html" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Back to Invoices
+                </a>
+            </div>
+        </header>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Due Invoices</h2>
+                <button id="sendAllBtn" class="btn btn-success">
+                    <i class="fas fa-paper-plane"></i> Send All Reminders
+                </button>
+            </div>
+            <div class="card-body">
+                <table id="remindersTable">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Invoice</th>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Days Overdue</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="remindersTableBody">
+                        <!-- Reminders will be inserted here -->
+                    </tbody>
+                </table>
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-bell-slash"></i>
+                    <h3>No Due Invoices Found</h3>
+                    <p>All your invoices are up to date with no overdue payments.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Reminder Modal -->
+    <div id="viewReminderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="reminderModalTitle">Invoice Details</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="reminderDetails">
+                    <!-- Reminder details will be inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="markAsSentBtn" class="btn btn-success">
+                    <i class="fas fa-check"></i> Mark as Sent
+                </button>
+                <button id="closeReminderBtn" class="btn btn-primary">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Reminder marked as sent</span>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const remindersTableBody = document.getElementById('remindersTableBody');
+        const emptyState = document.getElementById('emptyState');
+        const viewReminderModal = document.getElementById('viewReminderModal');
+        const reminderModalTitle = document.getElementById('reminderModalTitle');
+        const reminderDetails = document.getElementById('reminderDetails');
+        const markAsSentBtn = document.getElementById('markAsSentBtn');
+        const closeReminderBtn = document.getElementById('closeReminderBtn');
+        const sendAllBtn = document.getElementById('sendAllBtn');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        
+        // State
+        let invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+        let reminders = JSON.parse(localStorage.getItem('reminders')) || [];
+        let currentInvoiceId = null;
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDueInvoices();
+            setupEventListeners();
+        });
+        
+        function renderDueInvoices() {
+            // Get current date and filter invoices that are due or overdue
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const dueInvoices = invoices.filter(invoice => {
+                const dueDate = new Date(invoice.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                return dueDate <= today && invoice.status !== 'paid';
+            });
+            
+            // Clear table
+            remindersTableBody.innerHTML = '';
+            
+            // Show empty state if no due invoices
+            if (dueInvoices.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // Add due invoices to table
+            dueInvoices.forEach(invoice => {
+                const dueDate = new Date(invoice.dueDate);
+                const daysOverdue = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+                
+                // Check if reminder already exists for this invoice
+                const existingReminder = reminders.find(r => r.invoiceId === invoice.id);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <strong>${invoice.clientName}</strong><br>
+                        <small>${invoice.clientEmail}</small>
+                    </td>
+                    <td>${invoice.invoiceNumber}</td>
+                    <td>$${invoice.totalAmount.toFixed(2)}</td>
+                    <td>${formatDate(invoice.dueDate)}</td>
+                    <td>
+                        <span class="badge ${getStatusBadgeClass(invoice)}">
+                            ${capitalizeFirstLetter(invoice.status)}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${daysOverdue > 7 ? 'badge-danger' : 'badge-warning'}">
+                            ${daysOverdue} ${daysOverdue === 1 ? 'day' : 'days'} overdue
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn view-btn" data-id="${invoice.id}" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn send-btn" data-id="${invoice.id}" title="Send Reminder">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                remindersTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => viewInvoice(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.send-btn').forEach(btn => {
+                btn.addEventListener('click', () => sendReminder(btn.dataset.id));
+            });
+        }
+        
+        function viewInvoice(invoiceId) {
+            const invoice = invoices.find(i => i.id === invoiceId);
+            if (!invoice) return;
+            
+            currentInvoiceId = invoiceId;
+            reminderModalTitle.textContent = `Invoice ${invoice.invoiceNumber}`;
+            
+            const dueDate = new Date(invoice.dueDate);
+            const today = new Date();
+            const daysOverdue = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+            
+            reminderDetails.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4>Client Information</h4>
+                    <p><strong>Name:</strong> ${invoice.clientName}</p>
+                    <p><strong>Email:</strong> ${invoice.clientEmail}</p>
+                    <p><strong>Phone:</strong> ${invoice.clientPhone || 'N/A'}</p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4>Invoice Details</h4>
+                    <p><strong>Invoice Number:</strong> ${invoice.invoiceNumber}</p>
+                    <p><strong>Amount Due:</strong> $${invoice.totalAmount.toFixed(2)}</p>
+                    <p><strong>Due Date:</strong> ${formatDate(invoice.dueDate)}</p>
+                    <p><strong>Status:</strong> <span class="badge ${getStatusBadgeClass(invoice)}">${capitalizeFirstLetter(invoice.status)}</span></p>
+                    <p><strong>Days Overdue:</strong> <span class="badge ${daysOverdue > 7 ? 'badge-danger' : 'badge-warning'}">${daysOverdue} ${daysOverdue === 1 ? 'day' : 'days'}</span></p>
+                </div>
+                
+                <div>
+                    <h4>Items</h4>
+                    <table style="width: 100%; margin-top: 10px;">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${invoice.items.map(item => `
+                                <tr>
+                                    <td>${item.description}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>$${item.price.toFixed(2)}</td>
+                                    <td>$${(item.quantity * item.price).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            viewReminderModal.classList.add('active');
+        }
+        
+        function sendReminder(invoiceId) {
+            const invoice = invoices.find(i => i.id === invoiceId);
+            if (!invoice) return;
+            
+            // Check if reminder already exists
+            const existingReminderIndex = reminders.findIndex(r => r.invoiceId === invoiceId);
+            
+            if (existingReminderIndex !== -1) {
+                // Update existing reminder
+                reminders[existingReminderIndex].sentAt = new Date().toISOString();
+                reminders[existingReminderIndex].status = 'sent';
+            } else {
+                // Create new reminder
+                const reminder = {
+                    id: generateId(),
+                    invoiceId: invoice.id,
+                    invoiceNumber: invoice.invoiceNumber,
+                    clientName: invoice.clientName,
+                    clientEmail: invoice.clientEmail,
+                    amount: invoice.totalAmount,
+                    dueDate: invoice.dueDate,
+                    status: 'sent',
+                    sentAt: new Date().toISOString(),
+                    message: {
+                        subject: `Reminder: Invoice ${invoice.invoiceNumber} Overdue`,
+                        body: `Dear ${invoice.clientName},\n\nThis is a friendly reminder that Invoice ${invoice.invoiceNumber} for $${invoice.totalAmount.toFixed(2)} is overdue by ${Math.floor((new Date() - new Date(invoice.dueDate)) / (1000 * 60 * 60 * 24))} days. Please make the payment at your earliest convenience.\n\nThank you,\nYour Company`
+                    }
+                };
+                reminders.push(reminder);
+            }
+            
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+            renderDueInvoices();
+            
+            showToast('Reminder sent successfully', 'success');
+        }
+        
+        function sendAllReminders() {
+            // Get all due invoices
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const dueInvoices = invoices.filter(invoice => {
+                const dueDate = new Date(invoice.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                return dueDate <= today && invoice.status !== 'paid';
+            });
+            
+            let count = 0;
+            
+            dueInvoices.forEach(invoice => {
+                // Check if reminder already exists
+                const existingReminderIndex = reminders.findIndex(r => r.invoiceId === invoice.id);
+                
+                if (existingReminderIndex !== -1) {
+                    // Update existing reminder
+                    reminders[existingReminderIndex].sentAt = new Date().toISOString();
+                    reminders[existingReminderIndex].status = 'sent';
+                } else {
+                    // Create new reminder
+                    const reminder = {
+                        id: generateId(),
+                        invoiceId: invoice.id,
+                        invoiceNumber: invoice.invoiceNumber,
+                        clientName: invoice.clientName,
+                        clientEmail: invoice.clientEmail,
+                        amount: invoice.totalAmount,
+                        dueDate: invoice.dueDate,
+                        status: 'sent',
+                        sentAt: new Date().toISOString(),
+                        message: {
+                            subject: `Reminder: Invoice ${invoice.invoiceNumber} Overdue`,
+                            body: `Dear ${invoice.clientName},\n\nThis is a friendly reminder that Invoice ${invoice.invoiceNumber} for $${invoice.totalAmount.toFixed(2)} is overdue by ${Math.floor((new Date() - new Date(invoice.dueDate)) / (1000 * 60 * 60 * 24))} days. Please make the payment at your earliest convenience.\n\nThank you,\nYour Company`
+                        }
+                    };
+                    reminders.push(reminder);
+                }
+                count++;
+            });
+            
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+            renderDueInvoices();
+            
+            showToast(`Sent reminders for ${count} invoices`, 'success');
+        }
+        
+        function markCurrentAsSent() {
+            if (!currentInvoiceId) return;
+            sendReminder(currentInvoiceId);
+            viewReminderModal.classList.remove('active');
+        }
+        
+        function setupEventListeners() {
+            // Modal close buttons
+            document.querySelectorAll('.close, #closeReminderBtn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    viewReminderModal.classList.remove('active');
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === viewReminderModal) {
+                    viewReminderModal.classList.remove('active');
+                }
+            });
+            
+            // Mark as sent button
+            markAsSentBtn.addEventListener('click', markCurrentAsSent);
+            
+            // Send all button
+            sendAllBtn.addEventListener('click', sendAllReminders);
+        }
+        
+        // Helper functions
+        function generateId() {
+            return 'id-' + Math.random().toString(36).substr(2, 9);
+        }
+        
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+        
+        function formatDateTime(dateString) {
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+        
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        function getStatusBadgeClass(invoice) {
+            switch (invoice.status) {
+                case 'paid': return 'badge-success';
+                case 'overdue': return 'badge-danger';
+                default: return 'badge-info';
+            }
+        }
+        
+        function showToast(message, type = 'success') {
+            toast.className = `toast ${type}`;
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

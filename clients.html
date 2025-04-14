@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payminders | Client Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1A1A1A;
+            --secondary-color: #2D2D2D;
+            --accent-color: #FFD700;
+            --light-accent: #FFF5C2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #121212;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --text-color: #E0E0E0;
+            --text-muted: #A0A0A0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--secondary-color);
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            color: var(--accent-color);
+            font-size: 28px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-top: 3px solid var(--accent-color);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: #e6c200;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            z-index: -1;
+        }
+        
+        .btn-primary:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: var(--light-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: var(--light-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            color: var(--text-color);
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--primary-color);
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-top: 3px solid var(--accent-color);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+            z-index: -1;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-header h3 {
+            color: var(--accent-color);
+            font-size: 20px;
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close:hover {
+            color: var(--accent-color);
+        }
+        
+        .modal-body {
+            padding: 10px 0;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            bottom: 0;
+            background-color: var(--primary-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        
+        tr:hover {
+            background-color: rgba(255, 215, 0, 0.05);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-active {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success-color);
+        }
+        
+        .status-blacklisted {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger-color);
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+        }
+        
+        .filter-select {
+            width: 200px;
+        }
+        
+        .client-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border-top: 3px solid var(--accent-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+            z-index: 0;
+        }
+        
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            position: relative;
+        }
+        
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--text-muted);
+            position: relative;
+        }
+        
+        .total-clients .value {
+            color: var(--accent-color);
+        }
+        
+        .active-clients .value {
+            color: var(--success-color);
+        }
+        
+        .blacklisted-clients .value {
+            color: var(--danger-color);
+        }
+        
+        .high-risk-clients .value {
+            color: var(--warning-color);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        
+        /* 3D Background Elements */
+        #threejs-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+        
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            opacity: 0.6;
+            z-index: -1;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .client-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+            
+            .filter-select {
+                width: 100%;
+            }
+            
+            .action-btns {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .client-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Background Canvas -->
+    <div id="threejs-bg"></div>
+    
+    <!-- Floating Particles -->
+    <div class="particles-container"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-users"></i>
+                <h1>Client Management</h1>
+            </div>
+            <button class="btn btn-primary" id="addClientBtn">
+                <i class="fas fa-plus"></i> Add New Client
+            </button>
+        </header>
+        
+        <div class="card">
+            <div class="client-stats">
+                <div class="stat-card total-clients">
+                    <div class="value" id="totalClients">0</div>
+                    <div class="label">Total Clients</div>
+                </div>
+                <div class="stat-card active-clients">
+                    <div class="value" id="activeClients">0</div>
+                    <div class="label">Active Clients</div>
+                </div>
+                <div class="stat-card blacklisted-clients">
+                    <div class="value" id="blacklistedClients">0</div>
+                    <div class="label">Blacklisted</div>
+                </div>
+                <div class="stat-card high-risk-clients">
+                    <div class="value" id="highRiskClients">0</div>
+                    <div class="label">High Risk</div>
+                </div>
+            </div>
+            
+            <div class="search-filter">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search clients...">
+                </div>
+                <div class="filter-select">
+                    <select id="statusFilter" class="form-control">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="blacklisted">Blacklisted</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Total Invoices</th>
+                            <th>Outstanding</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody">
+                        <!-- Clients will be loaded here -->
+                    </tbody>
+                </table>
+                
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-user-slash"></i>
+                    <h3>No Clients Found</h3>
+                    <p>Add your first client to get started</p>
+                    <button class="btn btn-primary" id="addFirstClientBtn">
+                        <i class="fas fa-plus"></i> Add Client
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Client Modal - FIXED VERSION -->
+    <div id="clientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Client</h3>
+                <button class="close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="clientForm">
+                    <input type="hidden" id="clientId">
+                    <div class="form-group">
+                        <label for="clientName">Client Name *</label>
+                        <input type="text" id="clientName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEmail">Email</label>
+                        <input type="email" id="clientEmail" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPhone">Phone</label>
+                        <input type="tel" id="clientPhone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientCompany">Company</label>
+                        <input type="text" id="clientCompany" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientAddress">Address</label>
+                        <textarea id="clientAddress" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientNotes">Notes</label>
+                        <textarea id="clientNotes" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientStatus">Status</label>
+                        <select id="clientStatus" class="form-control">
+                            <option value="active">Active</option>
+                            <option value="blacklisted">Blacklisted</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientRisk">Risk Level</label>
+                        <select id="clientRisk" class="form-control">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger close-btn">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Client
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Confirm Action</h3>
+                <button class="close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirmCancel">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmAction">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Client Management System with Persistent Storage
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize 3D background
+    initThreeJSBackground();
+    
+    // Create floating particles
+    createParticles();
+    
+    // Initialize client management
+    initClientSystem();
+});
+
+function initClientSystem() {
+    // DOM Elements
+    const elements = {
+        tableBody: document.getElementById('clientsTableBody'),
+        addBtn: document.getElementById('addClientBtn'),
+        firstAddBtn: document.getElementById('addFirstClientBtn'),
+        modal: document.getElementById('clientModal'),
+        confirmModal: document.getElementById('confirmModal'),
+        form: document.getElementById('clientForm'),
+        search: document.getElementById('searchInput'),
+        statusFilter: document.getElementById('statusFilter'),
+        emptyState: document.getElementById('emptyState'),
+        stats: {
+            total: document.getElementById('totalClients'),
+            active: document.getElementById('activeClients'),
+            blacklisted: document.getElementById('blacklistedClients'),
+            highRisk: document.getElementById('highRiskClients')
+        }
+    };
+
+    // State
+    let clients = [];
+    let currentAction = null;
+    let currentClientId = null;
+
+    // Initialize
+    loadClients();
+    setupEventListeners();
+
+    // Core Functions
+    function loadClients() {
+        // Load from dedicated clients storage
+        const storedClients = JSON.parse(localStorage.getItem('clients')) || [];
+        
+        // Also load clients from invoices in reports.html
+        const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+        const invoiceClients = [];
+        
+        invoices.forEach(invoice => {
+            // Check if client already exists
+            const exists = storedClients.some(c => c.email === invoice.clientEmail) || 
+                          invoiceClients.some(c => c.email === invoice.clientEmail);
+            
+            if (!exists && invoice.clientName && invoice.clientEmail) {
+                invoiceClients.push({
+                    id: generateId(),
+                    name: invoice.clientName,
+                    email: invoice.clientEmail,
+                    phone: '',
+                    company: '',
+                    address: '',
+                    notes: 'Imported from invoice',
+                    status: 'active',
+                    risk: 'medium',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    fromInvoice: true
+                });
+            }
+        });
+        
+        // Merge both client sources
+        clients = [...storedClients, ...invoiceClients];
+        
+        // Save back to ensure invoice clients are stored
+        saveClients();
+        
+        updateClientStats();
+        renderClientTable();
+    }
+
+    function saveClients() {
+        // Filter out clients that came from invoices (we don't want to save these separately)
+        const clientsToSave = clients.filter(c => !c.fromInvoice);
+        localStorage.setItem('clients', JSON.stringify(clientsToSave));
+        updateClientStats();
+        renderClientTable();
+    }
+
+    function updateClientStats() {
+        elements.stats.total.textContent = clients.length;
+        elements.stats.active.textContent = clients.filter(c => c.status === 'active').length;
+        elements.stats.blacklisted.textContent = clients.filter(c => c.status === 'blacklisted').length;
+        elements.stats.highRisk.textContent = clients.filter(c => c.risk === 'high').length;
+        
+        // Show empty state if no clients
+        elements.emptyState.style.display = clients.length === 0 ? 'block' : 'none';
+    }
+
+    function renderClientTable(filteredClients = null) {
+        const clientsToRender = filteredClients || clients;
+        const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+        
+        elements.tableBody.innerHTML = clientsToRender.map(client => {
+            const clientInvoices = invoices.filter(inv => inv.clientEmail === client.email);
+            const totalInvoices = clientInvoices.length;
+            const outstandingInvoices = clientInvoices.filter(inv => inv.status !== 'paid').length;
+            
+            return `
+                <tr>
+                    <td>${client.name}</td>
+                    <td>
+                        <div>${client.email || 'N/A'}</div>
+                        <small class="text-muted">${client.phone || ''}</small>
+                    </td>
+                    <td>${totalInvoices}</td>
+                    <td>${outstandingInvoices}</td>
+                    <td>
+                        <span class="status-badge status-${client.status}">
+                            ${client.status === 'blacklisted' ? 'Blacklisted' : 'Active'}
+                        </span>
+                        ${client.risk === 'high' ? '<i class="fas fa-exclamation-triangle text-warning ml-2"></i>' : ''}
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn btn-primary btn-sm edit-btn" data-id="${client.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-id="${client.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            ${client.status === 'active' ? 
+                                `<button class="btn btn-warning btn-sm blacklist-btn" data-id="${client.id}">
+                                    <i class="fas fa-ban"></i>
+                                </button>` : 
+                                `<button class="btn btn-success btn-sm activate-btn" data-id="${client.id}">
+                                    <i class="fas fa-check"></i>
+                                </button>`}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        // Add event listeners to action buttons
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', () => editClient(btn.dataset.id));
+        });
+        
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => confirmDelete(btn.dataset.id));
+        });
+        
+        document.querySelectorAll('.blacklist-btn').forEach(btn => {
+            btn.addEventListener('click', () => confirmBlacklist(btn.dataset.id));
+        });
+        
+        document.querySelectorAll('.activate-btn').forEach(btn => {
+            btn.addEventListener('click', () => confirmActivate(btn.dataset.id));
+        });
+    }
+
+    function filterClients() {
+        const searchTerm = elements.search.value.toLowerCase();
+        const statusFilterValue = elements.statusFilter.value;
+        
+        const filtered = clients.filter(client => {
+            const matchesSearch = 
+                client.name.toLowerCase().includes(searchTerm) ||
+                (client.email && client.email.toLowerCase().includes(searchTerm)) ||
+                (client.phone && client.phone.toLowerCase().includes(searchTerm)) ||
+                (client.company && client.company.toLowerCase().includes(searchTerm));
+            
+            const matchesStatus = statusFilterValue === 'all' || client.status === statusFilterValue;
+            
+            return matchesSearch && matchesStatus;
+        });
+        
+        renderClientTable(filtered);
+    }
+
+    // Client Actions
+    function showAddClientModal() {
+        document.getElementById('modalTitle').textContent = 'Add New Client';
+        elements.form.reset();
+        document.getElementById('clientId').value = '';
+        document.getElementById('clientStatus').value = 'active';
+        document.getElementById('clientRisk').value = 'low';
+        elements.modal.style.display = 'flex';
+    }
+
+    function editClient(clientId) {
+        const client = clients.find(c => c.id === clientId);
+        if (!client) return;
+        
+        document.getElementById('modalTitle').textContent = 'Edit Client';
+        document.getElementById('clientId').value = client.id;
+        document.getElementById('clientName').value = client.name;
+        document.getElementById('clientEmail').value = client.email || '';
+        document.getElementById('clientPhone').value = client.phone || '';
+        document.getElementById('clientCompany').value = client.company || '';
+        document.getElementById('clientAddress').value = client.address || '';
+        document.getElementById('clientNotes').value = client.notes || '';
+        document.getElementById('clientStatus').value = client.status || 'active';
+        document.getElementById('clientRisk').value = client.risk || 'low';
+        
+        elements.modal.style.display = 'flex';
+    }
+
+    function saveClient(e) {
+        e.preventDefault();
+        
+        const clientId = document.getElementById('clientId').value;
+        const clientData = {
+            id: clientId || generateId(),
+            name: document.getElementById('clientName').value,
+            email: document.getElementById('clientEmail').value,
+            phone: document.getElementById('clientPhone').value,
+            company: document.getElementById('clientCompany').value,
+            address: document.getElementById('clientAddress').value,
+            notes: document.getElementById('clientNotes').value,
+            status: document.getElementById('clientStatus').value,
+            risk: document.getElementById('clientRisk').value,
+            createdAt: clientId ? clients.find(c => c.id === clientId).createdAt : new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        if (clientId) {
+            // Update existing client
+            const index = clients.findIndex(c => c.id === clientId);
+            if (index !== -1) {
+                clients[index] = clientData;
+            }
+        } else {
+            // Add new client
+            clients.unshift(clientData);
+        }
+        
+        saveClients();
+        closeModal();
+    }
+
+    function confirmDelete(clientId) {
+        currentAction = 'delete';
+        currentClientId = clientId;
+        
+        const client = clients.find(c => c.id === clientId);
+        document.getElementById('confirmTitle').textContent = 'Delete Client';
+        document.getElementById('confirmMessage').textContent = `Are you sure you want to delete ${client.name}? This action cannot be undone.`;
+        document.getElementById('confirmAction').textContent = 'Delete';
+        document.getElementById('confirmAction').className = 'btn btn-danger';
+        
+        elements.confirmModal.style.display = 'flex';
+    }
+
+    function confirmBlacklist(clientId) {
+        currentAction = 'blacklist';
+        currentClientId = clientId;
+        
+        const client = clients.find(c => c.id === clientId);
+        document.getElementById('confirmTitle').textContent = 'Blacklist Client';
+        document.getElementById('confirmMessage').textContent = `Are you sure you want to blacklist ${client.name}? Blacklisted clients will be marked as high risk.`;
+        document.getElementById('confirmAction').textContent = 'Blacklist';
+        document.getElementById('confirmAction').className = 'btn btn-warning';
+        
+        elements.confirmModal.style.display = 'flex';
+    }
+
+    function confirmActivate(clientId) {
+        currentAction = 'activate';
+        currentClientId = clientId;
+        
+        const client = clients.find(c => c.id === clientId);
+        document.getElementById('confirmTitle').textContent = 'Activate Client';
+        document.getElementById('confirmMessage').textContent = `Are you sure you want to activate ${client.name}?`;
+        document.getElementById('confirmAction').textContent = 'Activate';
+        document.getElementById('confirmAction').className = 'btn btn-success';
+        
+        elements.confirmModal.style.display = 'flex';
+    }
+
+    function confirmAction() {
+        const clientIndex = clients.findIndex(c => c.id === currentClientId);
+        if (clientIndex === -1) return;
+        
+        switch (currentAction) {
+            case 'delete':
+                clients.splice(clientIndex, 1);
+                break;
+                
+            case 'blacklist':
+                clients[clientIndex].status = 'blacklisted';
+                clients[clientIndex].risk = 'high';
+                clients[clientIndex].updatedAt = new Date().toISOString();
+                break;
+                
+            case 'activate':
+                clients[clientIndex].status = 'active';
+                clients[clientIndex].updatedAt = new Date().toISOString();
+                break;
+        }
+        
+        saveClients();
+        closeModal();
+    }
+
+    function closeModal() {
+        elements.modal.style.display = 'none';
+        elements.confirmModal.style.display = 'none';
+        currentAction = null;
+        currentClientId = null;
+    }
+
+    function setupEventListeners() {
+        // Client management
+        elements.addBtn.addEventListener('click', showAddClientModal);
+        elements.firstAddBtn.addEventListener('click', showAddClientModal);
+        elements.form.addEventListener('submit', saveClient);
+        elements.search.addEventListener('input', filterClients);
+        elements.statusFilter.addEventListener('change', filterClients);
+        
+        // Modal close buttons
+        document.querySelectorAll('.close, .close-btn').forEach(btn => {
+            btn.addEventListener('click', closeModal);
+        });
+        
+        // Confirmation modal
+        document.getElementById('confirmCancel').addEventListener('click', closeModal);
+        document.getElementById('confirmAction').addEventListener('click', confirmAction);
+    }
+
+    function generateId() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+}
+
+// 3D Background Initialization
+function initThreeJSBackground() {
+    const container = document.getElementById('threejs-bg');
+    if (!container) return;
+    
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+    
+    // Create golden wireframe cubes
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshBasicMaterial({ 
+        color: 0xFFD700,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.1
+    });
+    
+    const cubes = [];
+    const cubeCount = 10;
+    
+    for (let i = 0; i < cubeCount; i++) {
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.x = Math.random() * 20 - 10;
+        cube.position.y = Math.random() * 20 - 10;
+        cube.position.z = Math.random() * 20 - 10;
+        cube.rotation.x = Math.random() * Math.PI;
+        cube.rotation.y = Math.random() * Math.PI;
+        cube.scale.setScalar(0.5 + Math.random() * 2);
+        scene.add(cube);
+        cubes.push(cube);
+    }
+    
+    camera.position.z = 5;
+    
+    // Animation loop
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        cubes.forEach(cube => {
+            cube.rotation.x += 0.005;
+            cube.rotation.y += 0.005;
+        });
+        
+        renderer.render(scene, camera);
+    }
+    
+    animate();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+}
+
+// Create floating particles
+function createParticles() {
+    const container = document.querySelector('.particles-container');
+    if (!container) return;
+    
+    const particleCount = 30;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random size between 2px and 6px
+        const size = Math.random() * 4 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Random position
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Random animation
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 5;
+        particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+        
+        container.appendChild(particle);
+    }
+    
+    // Add CSS animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+            }
+            50% {
+                transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+            }
+            75% {
+                transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+    </script>
+</body>
+</html>

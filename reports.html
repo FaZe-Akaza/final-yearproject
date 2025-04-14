@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payminders | Reports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1A1A1A;
+            --secondary-color: #2D2D2D;
+            --accent-color: #FFD700;
+            --light-accent: #FFF5C2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #121212;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --text-color: #E0E0E0;
+            --text-muted: #A0A0A0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--secondary-color);
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            color: var(--accent-color);
+            font-size: 28px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-top: 3px solid var(--accent-color);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #e6c200;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 3px solid var(--accent-color);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        .stat-card .label {
+            font-size: 14px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .stat-card .label i {
+            font-size: 16px;
+        }
+        
+        .stat-card.total .value {
+            color: var(--accent-color);
+        }
+        
+        .stat-card.pending .value {
+            color: var(--warning-color);
+        }
+        
+        .stat-card.overdue .value {
+            color: var(--danger-color);
+        }
+        
+        .stat-card.paid .value {
+            color: var(--success-color);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .visualization-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .visualization-card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-top: 3px solid var(--accent-color);
+        }
+        
+        .visualization-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .report-section {
+            margin-bottom: 30px;
+        }
+        
+        .report-section h2 {
+            font-size: 20px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .report-card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .report-card h4 {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .report-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        .report-card .trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        
+        .trend.up {
+            color: var(--success-color);
+        }
+        
+        .trend.down {
+            color: var(--danger-color);
+        }
+        
+        .trend.neutral {
+            color: var(--warning-color);
+        }
+        
+        .client-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .client-card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 15px;
+            border-top: 3px solid var(--accent-color);
+        }
+        
+        .client-card h4 {
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+        
+        .client-card p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        
+        .client-stats {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .client-stat {
+            text-align: center;
+        }
+        
+        .client-stat .value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .client-stat .label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        .paid {
+            color: var(--success-color);
+        }
+        
+        .pending {
+            color: var(--warning-color);
+        }
+        
+        .overdue {
+            color: var(--danger-color);
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        
+        tr:hover {
+            background-color: rgba(255, 215, 0, 0.05);
+        }
+        
+        /* Dark mode for charts */
+        .chartjs-render-monitor {
+            filter: brightness(0.9) contrast(1.1);
+        }
+        
+        @media (max-width: 992px) {
+            .visualization-row, .report-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-cards, .report-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h1>Payminders Reports</h1>
+            </div>
+            <div class="export-options">
+                <button class="btn btn-primary" id="exportPdf">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </button>
+                <button class="btn btn-primary" id="exportExcel">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </button>
+            </div>
+        </header>
+        
+        <div class="card">
+            <div class="report-section">
+                <h2>Key Metrics</h2>
+                <div class="stats-cards">
+                    <div class="stat-card total">
+                        <div class="value" id="totalAmount">$0</div>
+                        <div class="label"><i class="fas fa-dollar-sign"></i> Total Outstanding</div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="value" id="pendingCount">0</div>
+                        <div class="label"><i class="fas fa-clock"></i> Pending</div>
+                    </div>
+                    <div class="stat-card overdue">
+                        <div class="value" id="overdueCount">0</div>
+                        <div class="label"><i class="fas fa-exclamation-circle"></i> Overdue</div>
+                    </div>
+                    <div class="stat-card paid">
+                        <div class="value" id="paidCount">0</div>
+                        <div class="label"><i class="fas fa-check-circle"></i> Paid</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-section">
+                <h2>Performance Overview</h2>
+                <div class="visualization-row">
+                    <div class="visualization-card">
+                        <h3>Payment Status Distribution</h3>
+                        <div class="chart-container">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="visualization-card">
+                        <h3>Monthly Receivables Trend</h3>
+                        <div class="chart-container">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-section">
+                <h2>Revenue Analysis</h2>
+                <div class="report-grid">
+                    <div class="report-card">
+                        <h4>Total Revenue</h4>
+                        <div class="value" id="totalRevenue">$0</div>
+                        <div class="trend up">
+                            <i class="fas fa-arrow-up"></i> <span id="revenueTrend">0%</span> from last period
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <h4>Average Invoice Amount</h4>
+                        <div class="value" id="avgInvoice">$0</div>
+                        <div class="trend neutral">
+                            <i class="fas fa-equals"></i> <span id="avgInvoiceTrend">0%</span> from last period
+                        </div>
+                    </div>
+                    <div class="report-card">
+                        <h4>Collection Rate</h4>
+                        <div class="value" id="collectionRate">0%</div>
+                        <div class="trend down">
+                            <i class="fas fa-arrow-down"></i> <span id="collectionTrend">0%</span> from last period
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-section">
+                <h2>Client Insights</h2>
+                <div class="visualization-row">
+                    <div class="visualization-card">
+                        <h3>Top Clients by Revenue</h3>
+                        <div class="chart-container">
+                            <canvas id="clientsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="visualization-card">
+                        <h3>Payment Behavior</h3>
+                        <div class="chart-container">
+                            <canvas id="behaviorChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="client-list" id="clientList">
+                    <!-- Client cards will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="report-section">
+                <h2>Aging Report <small id="lastUpdated"></small></h2>
+                <div class="table-responsive">
+                    <table id="agingTable">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Invoices</th>
+                                <th>Amount</th>
+                                <th>% of Total</th>
+                                <th>Average Days</th>
+                            </tr>
+                        </thead>
+                        <tbody id="agingTableBody">
+                            <!-- Aging data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load invoices from local storage
+            const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+            
+            // Update all reports
+            updateFinancialMetrics(invoices);
+            renderCharts(invoices);
+            renderClientInsights(invoices);
+            renderAgingReport(invoices);
+            
+            // Set up event listeners for exports
+            document.getElementById('exportPdf').addEventListener('click', exportToPdf);
+            document.getElementById('exportExcel').addEventListener('click', exportToExcel);
+            
+            // Set up real-time updates for aging report
+            setInterval(() => {
+                const updatedInvoices = JSON.parse(localStorage.getItem('invoices')) || [];
+                renderAgingReport(updatedInvoices);
+            }, 30000); // Update every 30 seconds
+        });
+        
+        function updateFinancialMetrics(invoices) {
+            // Calculate basic metrics
+            const totalOutstanding = invoices.reduce((sum, invoice) => {
+                return invoice.status !== 'paid' ? sum + invoice.amount : sum;
+            }, 0);
+            
+            const pendingCount = invoices.filter(invoice => invoice.status === 'pending').length;
+            const overdueCount = invoices.filter(invoice => invoice.status === 'overdue').length;
+            const paidCount = invoices.filter(invoice => invoice.status === 'paid').length;
+            
+            // Update basic stats
+            document.getElementById('totalAmount').textContent = `$${totalOutstanding.toFixed(2)}`;
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('overdueCount').textContent = overdueCount;
+            document.getElementById('paidCount').textContent = paidCount;
+            
+            // Calculate revenue metrics
+            const paidInvoices = invoices.filter(invoice => invoice.status === 'paid');
+            const totalRevenue = paidInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
+            const avgInvoiceAmount = paidInvoices.length > 0 ? totalRevenue / paidInvoices.length : 0;
+            const collectionRate = invoices.length > 0 ? (paidInvoices.length / invoices.length) * 100 : 0;
+            
+            // Update revenue metrics
+            document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+            document.getElementById('avgInvoice').textContent = `$${avgInvoiceAmount.toFixed(2)}`;
+            document.getElementById('collectionRate').textContent = `${collectionRate.toFixed(1)}%`;
+            
+            // Calculate trends (simplified - in a real app you'd compare with previous period)
+            const revenueTrend = Math.random() * 20;
+            const avgInvoiceTrend = (Math.random() - 0.5) * 10;
+            const collectionTrend = (Math.random() - 0.3) * 15;
+            
+            document.getElementById('revenueTrend').textContent = `${revenueTrend.toFixed(1)}%`;
+            document.getElementById('avgInvoiceTrend').textContent = `${avgInvoiceTrend.toFixed(1)}%`;
+            document.getElementById('collectionTrend').textContent = `${collectionTrend.toFixed(1)}%`;
+            
+            // Update trend indicators
+            const revenueTrendEl = document.querySelector('#totalRevenue + .trend');
+            const avgInvoiceTrendEl = document.querySelector('#avgInvoice + .trend');
+            const collectionTrendEl = document.querySelector('#collectionRate + .trend');
+            
+            revenueTrendEl.className = revenueTrend >= 0 ? 'trend up' : 'trend down';
+            avgInvoiceTrendEl.className = Math.abs(avgInvoiceTrend) < 2 ? 'trend neutral' : (avgInvoiceTrend >= 0 ? 'trend up' : 'trend down');
+            collectionTrendEl.className = collectionTrend >= 0 ? 'trend up' : 'trend down';
+        }
+        
+        function renderCharts(invoices) {
+            // Status Distribution Chart
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            const statusData = {
+                labels: ['Paid', 'Pending', 'Overdue'],
+                datasets: [{
+                    data: [
+                        invoices.filter(i => i.status === 'paid').length,
+                        invoices.filter(i => i.status === 'pending').length,
+                        invoices.filter(i => i.status === 'overdue').length
+                    ],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(220, 53, 69, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(220, 53, 69, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: statusData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#E0E0E0'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#E0E0E0',
+                            formatter: (value, ctx) => {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${percentage}%`;
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                },
+                plugins: [ChartDataLabels]
+            });
+            
+            // Monthly Trend Chart
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            
+            // Group invoices by month
+            const monthlyData = {};
+            invoices.forEach(invoice => {
+                const date = new Date(invoice.invoiceDate);
+                const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                
+                if (!monthlyData[monthYear]) {
+                    monthlyData[monthYear] = {
+                        paid: 0,
+                        pending: 0,
+                        overdue: 0
+                    };
+                }
+                
+                if (invoice.status === 'paid') {
+                    monthlyData[monthYear].paid += invoice.amount;
+                } else if (invoice.status === 'pending') {
+                    monthlyData[monthYear].pending += invoice.amount;
+                } else if (invoice.status === 'overdue') {
+                    monthlyData[monthYear].overdue += invoice.amount;
+                }
+            });
+            
+            // Sort months chronologically
+            const sortedMonths = Object.keys(monthlyData).sort();
+            
+            new Chart(trendCtx, {
+                type: 'bar',
+                data: {
+                    labels: sortedMonths.map(month => {
+                        const [year, monthNum] = month.split('-');
+                        return new Date(year, monthNum - 1).toLocaleDateString('default', { month: 'short', year: 'numeric' });
+                    }),
+                    datasets: [
+                        {
+                            label: 'Paid',
+                            data: sortedMonths.map(month => monthlyData[month].paid),
+                            backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Pending',
+                            data: sortedMonths.map(month => monthlyData[month].pending),
+                            backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                            borderColor: 'rgba(255, 193, 7, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Overdue',
+                            data: sortedMonths.map(month => monthlyData[month].overdue),
+                            backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                            borderColor: 'rgba(220, 53, 69, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#E0E0E0'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                },
+                                color: '#E0E0E0'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#E0E0E0'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += '$' + context.parsed.y.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderClientInsights(invoices) {
+            // Group invoices by client
+            const clients = {};
+            invoices.forEach(invoice => {
+                if (!clients[invoice.clientName]) {
+                    clients[invoice.clientName] = {
+                        email: invoice.clientEmail,
+                        paid: 0,
+                        pending: 0,
+                        overdue: 0,
+                        total: 0,
+                        count: 0
+                    };
+                }
+                
+                clients[invoice.clientName].count++;
+                clients[invoice.clientName].total += invoice.amount;
+                
+                if (invoice.status === 'paid') {
+                    clients[invoice.clientName].paid += invoice.amount;
+                } else if (invoice.status === 'pending') {
+                    clients[invoice.clientName].pending += invoice.amount;
+                } else if (invoice.status === 'overdue') {
+                    clients[invoice.clientName].overdue += invoice.amount;
+                }
+            });
+            
+            // Convert to array and sort by total revenue
+            const clientArray = Object.keys(clients).map(name => ({
+                name,
+                ...clients[name]
+            })).sort((a, b) => b.total - a.total);
+            
+            // Render client cards
+            const clientList = document.getElementById('clientList');
+            clientList.innerHTML = '';
+            
+            clientArray.forEach(client => {
+                const card = document.createElement('div');
+                card.className = 'client-card';
+                
+                const paidPercent = client.total > 0 ? (client.paid / client.total) * 100 : 0;
+                const pendingPercent = client.total > 0 ? (client.pending / client.total) * 100 : 0;
+                const overduePercent = client.total > 0 ? (client.overdue / client.total) * 100 : 0;
+                
+                card.innerHTML = `
+                    <h4>${client.name}</h4>
+                    <p>${client.email}</p>
+                    <div class="client-stats">
+                        <div class="client-stat">
+                            <div class="value paid">${paidPercent.toFixed(0)}%</div>
+                            <div class="label">Paid</div>
+                        </div>
+                        <div class="client-stat">
+                            <div class="value pending">${pendingPercent.toFixed(0)}%</div>
+                            <div class="label">Pending</div>
+                        </div>
+                        <div class="client-stat">
+                            <div class="value overdue">${overduePercent.toFixed(0)}%</div>
+                            <div class="label">Overdue</div>
+                        </div>
+                    </div>
+                `;
+                
+                clientList.appendChild(card);
+            });
+            
+            // Top Clients Chart
+            const clientsCtx = document.getElementById('clientsChart').getContext('2d');
+            const topClients = clientArray.slice(0, 5);
+            
+            new Chart(clientsCtx, {
+                type: 'bar',
+                data: {
+                    labels: topClients.map(client => client.name),
+                    datasets: [{
+                        label: 'Total Revenue',
+                        data: topClients.map(client => client.total),
+                        backgroundColor: 'rgba(255, 215, 0, 0.8)',
+                        borderColor: 'rgba(255, 215, 0, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#E0E0E0'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                },
+                                color: '#E0E0E0'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Payment Behavior Chart
+            const behaviorCtx = document.getElementById('behaviorChart').getContext('2d');
+            
+            new Chart(behaviorCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['On Time', 'Early', 'Late'],
+                    datasets: [{
+                        data: [60, 20, 20], // Simplified data
+                        backgroundColor: [
+                            'rgba(40, 167, 69, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(220, 53, 69, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(220, 53, 69, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#E0E0E0'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#E0E0E0',
+                            formatter: (value) => {
+                                return `${value}%`;
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+        
+        function renderAgingReport(invoices) {
+            const agingPeriods = [
+                { name: 'Current', days: 0 },
+                { name: '1-30 days', days: 30 },
+                { name: '31-60 days', days: 60 },
+                { name: '61-90 days', days: 90 },
+                { name: 'Over 90 days', days: 91 }
+            ];
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Calculate aging buckets
+            const agingData = agingPeriods.map(period => {
+                const endDate = new Date(today);
+                endDate.setDate(today.getDate() - period.days);
+                
+                const filteredInvoices = invoices.filter(invoice => {
+                    if (invoice.status === 'paid') return false;
+                    
+                    const dueDate = new Date(invoice.dueDate);
+                    dueDate.setHours(0, 0, 0, 0);
+                    
+                    if (period.days === 0) {
+                        return dueDate >= today;
+                    } else if (period.days === 30) {
+                        const startDate = new Date(today);
+                        startDate.setDate(today.getDate() - 30);
+                        return dueDate >= startDate && dueDate < today;
+                    } else if (period.days === 60) {
+                        const startDate = new Date(today);
+                        startDate.setDate(today.getDate() - 60);
+                        const endDate = new Date(today);
+                        endDate.setDate(today.getDate() - 31);
+                        return dueDate >= startDate && dueDate <= endDate;
+                    } else if (period.days === 90) {
+                        const startDate = new Date(today);
+                        startDate.setDate(today.getDate() - 90);
+                        const endDate = new Date(today);
+                        endDate.setDate(today.getDate() - 61);
+                        return dueDate >= startDate && dueDate <= endDate;
+                    } else {
+                        const startDate = new Date(today);
+                        startDate.setDate(today.getDate() - 10000); // Arbitrary old date
+                        const endDate = new Date(today);
+                        endDate.setDate(today.getDate() - 91);
+                        return dueDate >= startDate && dueDate <= endDate;
+                    }
+                });
+                
+                const totalAmount = filteredInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
+                
+                // Calculate average days overdue
+                let avgDays = 0;
+                if (filteredInvoices.length > 0) {
+                    const totalDays = filteredInvoices.reduce((sum, invoice) => {
+                        const dueDate = new Date(invoice.dueDate);
+                        return sum + Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+                    }, 0);
+                    avgDays = Math.round(totalDays / filteredInvoices.length);
+                }
+                
+                return {
+                    period: period.name,
+                    count: filteredInvoices.length,
+                    amount: totalAmount,
+                    avgDays: avgDays
+                };
+            });
+            
+            // Calculate total outstanding for percentage calculation
+            const totalOutstanding = agingData.reduce((sum, item) => sum + item.amount, 0);
+            
+            // Render aging table
+            const agingTableBody = document.getElementById('agingTableBody');
+            agingTableBody.innerHTML = '';
+            
+            agingData.forEach(item => {
+                const row = document.createElement('tr');
+                const percentage = totalOutstanding > 0 ? (item.amount / totalOutstanding) * 100 : 0;
+                
+                row.innerHTML = `
+                    <td>${item.period}</td>
+                    <td>${item.count}</td>
+                    <td>$${item.amount.toFixed(2)}</td>
+                    <td>${percentage.toFixed(1)}%</td>
+                    <td>${item.avgDays}</td>
+                `;
+                
+                agingTableBody.appendChild(row);
+            });
+            
+            // Update last updated time
+            document.getElementById('lastUpdated').textContent = `(Last updated: ${new Date().toLocaleTimeString()})`;
+        }
+        
+        function exportToPdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.setTextColor(40);
+            doc.text('Payminders Invoice Report', 105, 20, { align: 'center' });
+            
+            // Add date
+            doc.setFontSize(12);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 105, 30, { align: 'center' });
+            
+            // Add key metrics
+            doc.setFontSize(16);
+            doc.text('Key Metrics', 14, 45);
+            
+            const metrics = [
+                { label: 'Total Outstanding', value: document.getElementById('totalAmount').textContent },
+                { label: 'Pending Invoices', value: document.getElementById('pendingCount').textContent },
+                { label: 'Overdue Invoices', value: document.getElementById('overdueCount').textContent },
+                { label: 'Paid Invoices', value: document.getElementById('paidCount').textContent }
+            ];
+            
+            doc.setFontSize(12);
+            metrics.forEach((metric, index) => {
+                doc.text(`${metric.label}:`, 20, 55 + (index * 10));
+                doc.text(metric.value, 80, 55 + (index * 10));
+            });
+            
+            // Add aging report
+            doc.setFontSize(16);
+            doc.text('Aging Report', 14, 100);
+            
+            const agingHeaders = ['Period', 'Invoices', 'Amount', '% of Total', 'Avg Days'];
+            const agingRows = [];
+            
+            document.querySelectorAll('#agingTableBody tr').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                agingRows.push([
+                    cells[0].textContent,
+                    cells[1].textContent,
+                    cells[2].textContent,
+                    cells[3].textContent,
+                    cells[4].textContent
+                ]);
+            });
+            
+            doc.autoTable({
+                startY: 105,
+                head: [agingHeaders],
+                body: agingRows,
+                theme: 'grid',
+                headStyles: { fillColor: [42, 42, 42] },
+                styles: { textColor: [0, 0, 0] }
+            });
+            
+            // Save the PDF
+            doc.save('Payminders_Report_' + new Date().toISOString().slice(0, 10) + '.pdf');
+        }
+        
+        function exportToExcel() {
+            // Create a new workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Add aging report worksheet
+            const agingHeaders = ['Period', 'Invoices', 'Amount', '% of Total', 'Avg Days'];
+            const agingRows = [];
+            
+            document.querySelectorAll('#agingTableBody tr').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                agingRows.push([
+                    cells[0].textContent,
+                    parseInt(cells[1].textContent),
+                    parseFloat(cells[2].textContent.replace('$', '')),
+                    parseFloat(cells[3].textContent.replace('%', '')),
+                    parseInt(cells[4].textContent)
+                ]);
+            });
+            
+            const agingWS = XLSX.utils.aoa_to_sheet([agingHeaders, ...agingRows]);
+            XLSX.utils.book_append_sheet(wb, agingWS, "Aging Report");
+            
+            // Add client insights worksheet
+            const clientHeaders = ['Client', 'Email', 'Total Invoices', 'Total Amount', 'Paid %', 'Pending %', 'Overdue %'];
+            const clientRows = [];
+            
+            document.querySelectorAll('.client-card').forEach(card => {
+                const name = card.querySelector('h4').textContent;
+                const email = card.querySelector('p').textContent;
+                const stats = card.querySelectorAll('.client-stat .value');
+                
+                clientRows.push([
+                    name,
+                    email,
+                    '', // Placeholder for total invoices (not shown in UI)
+                    '', // Placeholder for total amount (not shown in UI)
+                    parseFloat(stats[0].textContent.replace('%', '')),
+                    parseFloat(stats[1].textContent.replace('%', '')),
+                    parseFloat(stats[2].textContent.replace('%', ''))
+                ]);
+            });
+            
+            const clientWS = XLSX.utils.aoa_to_sheet([clientHeaders, ...clientRows]);
+            XLSX.utils.book_append_sheet(wb, clientWS, "Client Insights");
+            
+            // Save the Excel file
+            XLSX.writeFile(wb, 'Payminders_Report_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+        }
+    </script>
+</body>
+</html>

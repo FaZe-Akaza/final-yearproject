@@ -1,0 +1,123 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: url('michyv.jpg') no-repeat center center/cover;
+}
+
+.container {
+  display: flex;
+  width: 700px;
+  height: 400px;
+  background: rgba(30, 30, 30, 0.7); /* Increased transparency */
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3); /* Softer glow */
+  overflow: hidden;
+  backdrop-filter: blur(6px); /* Lighter blur effect */
+}
+
+.left-section {
+  flex: 2;
+  padding: 40px;
+  color: #ffd700;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.left-section h1 {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 40px 10px 10px;
+  font-size: 16px;
+  border: 1px solid #ffd700;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.15); /* Increased transparency */
+  color: white;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 8px #ffd700;
+}
+
+.input-group i {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffd700;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background: #ffd700;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #caa500;
+  box-shadow: 0 0 10px #ffd700;
+}
+
+.footer {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.footer a {
+  color: #ffd700;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.right-section {
+  flex: 1;
+  background: rgba(42, 42, 42, 0.6); /* Increased transparency */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #ffd700;
+  text-align: center;
+  padding: 20px;
+}
+
+.right-section h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.right-section p {
+  font-size: 14px;
+}

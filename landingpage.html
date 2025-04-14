@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DueTrack - Free Invoice & Payment Tracker</title>
+    <style>
+        :root {
+            --primary: #D4AF37; /* Gold */
+            --secondary: #808080; /* Grey */
+            --dark: #121212; /* Dark Black */
+            --light: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: white;
+            line-height: 1.6;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('fin2.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        
+        header {
+            background-color: rgba(18, 18, 18, 0.9);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .cta-button {
+            background-color: var(--primary);
+            color: var(--dark);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background-color: #c9a227;
+            transform: translateY(-2px);
+        }
+        
+        .hero {
+            padding: 8rem 5% 4rem;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: #cccccc;
+        }
+        
+        .demo {
+            padding: 5rem 5%;
+            text-align: center;
+            background-color: rgba(18, 18, 18, 0.8);
+        }
+        
+        .demo h2 {
+            font-size: 2.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .demo p {
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            color: #aaaaaa;
+        }
+        
+        .demo-image {
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3), 0 10px 10px -5px rgba(0,0,0,0.1);
+        }
+        
+        .demo-image img {
+            width: 100%;
+            display: block;
+        }
+        
+        .testimonials {
+            padding: 5rem 5%;
+            background-color: rgba(18, 18, 18, 0.9);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.25rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .section-title p {
+            color: #aaaaaa;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .testimonial-card {
+            background: rgba(40, 40, 40, 0.7);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .add-testimonial {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-testimonial:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+        
+        .add-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            color: #dddddd;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #333333;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .author-info h4 {
+            margin: 0;
+            color: white;
+        }
+        
+        .author-info p {
+            margin: 0;
+            color: #aaaaaa;
+            font-size: 0.875rem;
+        }
+        
+        .footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 4rem 5%;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-links a {
+            color: #cccccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .copyright {
+            color: #777777;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.25rem;
+            }
+            
+            .hero p {
+                font-size: 1.125rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <div class="logo">Payminders</div>
+            <div class="nav-links">
+                <a href="#how-it-works">How It Works</a>
+           
+                <a href="#contact">Contact</a>
+            </div>
+            <a href="login.html" class="cta-button">Get Started Free</a>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <h1>Track Invoices & Payments Effortlessly</h1>
+        <p>DueTrack helps you manage outstanding invoices, payment deadlines, and client communications - completely free forever.</p>
+        <a href="login.html" class="cta-button">Start Tracking Now</a>
+    </section>
+    
+    <section class="demo" id="how-it-works">
+        <h2>Your Payments, Under Control</h2>
+        <p>Our clean interface shows you exactly what's due, when, and from whom - so you never miss a payment again.</p>
+        <div class="demo-image">
+            <!-- Replace with actual screenshot of your app -->
+            <img src="https://via.placeholder.com/900x500/333333/cccccc?text=DueTrack+Dashboard" alt="Payminders">
+        </div>
+    </section>
+    
+        
+     
+            
+           
+    </section>
+    
+    <section class="footer" id="contact">
+        <div class="footer-links">
+            <a href="#privacy">Privacy Policy</a>
+            <a href="#terms">Terms of Service</a>
+            <a href="mailto:support@duetrack.com">Contact Support</a>
+            <a href="#blog">Blog</a>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2023 DueTrack. All rights reserved.</p>
+        </div>
+    </section>
+
+    
+</body>
+</html>

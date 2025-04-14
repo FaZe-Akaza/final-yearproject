@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Payminders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+        
+        /* Navbar Styles (same as before) */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background-color: #1a1a1a;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid #d4af37;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #d4af37;
+            cursor: pointer;
+            letter-spacing: 1px;
+        }
+        
+        .navbar ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            margin-right: auto;
+            margin-left: 3rem;
+        }
+        
+        .navbar ul li a {
+            text-decoration: none;
+            color: #b3b3b3;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.5px;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+        
+        /* Profile Container */
+        .profile-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .profile-header {
+            background: linear-gradient(to right, #1a1a1a, #333);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .profile-pic-container {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            border-radius: 50%;
+            border: 4px solid #d4af37;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+        
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .upload-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: #d4af37;
+            color: #1a1a1a;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        
+        .upload-btn i {
+            font-size: 1.2rem;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .profile-name {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #d4af37;
+        }
+        
+        .profile-role {
+            font-size: 1rem;
+            color: #b3b3b3;
+            margin-bottom: 1rem;
+        }
+        
+        .profile-body {
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .profile-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #d4af37;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .info-item {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #555;
+            min-width: 120px;
+            margin-right: 1rem;
+        }
+        
+        .info-value {
+            flex: 1;
+            color: #333;
+        }
+        
+        .edit-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        .edit-input:focus {
+            border-color: #d4af37;
+            outline: none;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background-color: #d4af37;
+            color: #1a1a1a;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c9a227;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #1a1a1a;
+            color: white;
+            margin-right: 1rem;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #333;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            padding: 1rem 2rem;
+            border-top: 1px solid #eee;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            color: white;
+            background-color: #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .toast.error {
+            background-color: #f44336;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .profile-body {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-name {
+                font-size: 1.5rem;
+            }
+            
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .info-label {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">Payminders</div>
+        
+                <div class="profile-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-pic-container">
+                    <img id="profile-pic" class="profile-pic" src="https://via.placeholder.com/150" alt="Profile Picture">
+                    <label for="file-input" class="upload-btn">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="file-input" accept="image/*">
+                </div>
+                <h1 class="profile-name" id="profile-name">John Doe</h1>
+                <p class="profile-role" id="profile-role">Administrator</p>
+            </div>
+            
+            <div class="profile-body">
+                <div class="profile-section">
+                    <h2 class="section-title">
+                        Personal Information
+                        <button id="edit-personal-btn" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9rem;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </h2>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Full Name:</span>
+                        <span class="info-value" id="full-name">John Doe</span>
+                        <input type="text" class="edit-input" id="edit-full-name" style="display: none;">
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="email">john.doe@example.com</span>
+                        <input type="email" class="edit-input" id="edit-email" style="display: none;">
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Phone:</span>
+                        <span class="info-value" id="phone">(123) 456-7890</span>
+                        <input type="tel" class="edit-input" id="edit-phone" style="display: none;">
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Address:</span>
+                        <span class="info-value" id="address">123 Main St, Anytown, USA</span>
+                        <input type="text" class="edit-input" id="edit-address" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="profile-section">
+                    <h2 class="section-title">
+                        Account Information
+                        <button id="edit-account-btn" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9rem;">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </h2>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Username:</span>
+                        <span class="info-value" id="username">johndoe</span>
+                        <input type="text" class="edit-input" id="edit-username" style="display: none;">
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Password:</span>
+                        <span class="info-value" id="password">••••••••</span>
+                        <input type="password" class="edit-input" id="edit-password" style="display: none;">
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Member Since:</span>
+                        <span class="info-value" id="join-date">January 15, 2022</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <span class="info-label">Last Login:</span>
+                        <span class="info-value" id="last-login">Today, 10:30 AM</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="save-btn" class="btn btn-primary" style="display: none;">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button id="cancel-btn" class="btn btn-secondary" style="display: none;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Profile updated successfully!</span>
+    </div>
+
+    <script>
+        // Load user data from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user data exists in localStorage
+            if (localStorage.getItem('userData')) {
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                
+                // Display user data
+                document.getElementById('profile-name').textContent = userData.fullName;
+                document.getElementById('profile-role').textContent = userData.role;
+                document.getElementById('full-name').textContent = userData.fullName;
+                document.getElementById('email').textContent = userData.email;
+                document.getElementById('phone').textContent = userData.phone;
+                document.getElementById('address').textContent = userData.address;
+                document.getElementById('username').textContent = userData.username;
+                document.getElementById('join-date').textContent = userData.joinDate;
+                document.getElementById('last-login').textContent = userData.lastLogin;
+                
+                // Set profile picture if available
+                if (userData.profilePic) {
+                    document.getElementById('profile-pic').src = userData.profilePic;
+                }
+            } else {
+                // Default data if no user data exists
+                const defaultData = {
+                    fullName: "John Doe",
+                    role: "Administrator",
+                    email: "john.doe@example.com",
+                    phone: "(123) 456-7890",
+                    address: "123 Main St, Anytown, USA",
+                    username: "johndoe",
+                    password: "password123",
+                    joinDate: "January 15, 2022",
+                    lastLogin: new Date().toLocaleString(),
+                    profilePic: "https://via.placeholder.com/150"
+                };
+                
+                localStorage.setItem('userData', JSON.stringify(defaultData));
+                location.reload(); // Refresh to display the default data
+            }
+            
+            // Set up edit buttons
+            setupEditButtons();
+            
+            // Set up profile picture upload
+            setupProfilePicUpload();
+        });
+        
+        function setupEditButtons() {
+            const editPersonalBtn = document.getElementById('edit-personal-btn');
+            const editAccountBtn = document.getElementById('edit-account-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            
+            let isEditing = false;
+            
+            editPersonalBtn.addEventListener('click', function() {
+                if (!isEditing) {
+                    startEditing();
+                }
+            });
+            
+            editAccountBtn.addEventListener('click', function() {
+                if (!isEditing) {
+                    startEditing();
+                }
+            });
+            
+            saveBtn.addEventListener('click', saveChanges);
+            cancelBtn.addEventListener('click', cancelEditing);
+            
+            function startEditing() {
+                isEditing = true;
+                
+                // Get current values
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                
+                // Replace spans with input fields
+                document.getElementById('full-name').style.display = 'none';
+                document.getElementById('edit-full-name').style.display = 'block';
+                document.getElementById('edit-full-name').value = userData.fullName;
+                
+                document.getElementById('email').style.display = 'none';
+                document.getElementById('edit-email').style.display = 'block';
+                document.getElementById('edit-email').value = userData.email;
+                
+                document.getElementById('phone').style.display = 'none';
+                document.getElementById('edit-phone').style.display = 'block';
+                document.getElementById('edit-phone').value = userData.phone;
+                
+                document.getElementById('address').style.display = 'none';
+                document.getElementById('edit-address').style.display = 'block';
+                document.getElementById('edit-address').value = userData.address;
+                
+                document.getElementById('username').style.display = 'none';
+                document.getElementById('edit-username').style.display = 'block';
+                document.getElementById('edit-username').value = userData.username;
+                
+                document.getElementById('password').style.display = 'none';
+                document.getElementById('edit-password').style.display = 'block';
+                document.getElementById('edit-password').value = userData.password;
+                
+                // Show save and cancel buttons
+                saveBtn.style.display = 'inline-block';
+                cancelBtn.style.display = 'inline-block';
+                
+                // Hide edit buttons
+                editPersonalBtn.style.display = 'none';
+                editAccountBtn.style.display = 'none';
+            }
+            
+            function saveChanges() {
+                isEditing = false;
+                
+                // Get the user data from localStorage
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                
+                // Update the user data with new values
+                userData.fullName = document.getElementById('edit-full-name').value;
+                userData.email = document.getElementById('edit-email').value;
+                userData.phone = document.getElementById('edit-phone').value;
+                userData.address = document.getElementById('edit-address').value;
+                userData.username = document.getElementById('edit-username').value;
+                userData.password = document.getElementById('edit-password').value;
+                
+                // Save back to localStorage
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                // Update the displayed values
+                document.getElementById('profile-name').textContent = userData.fullName;
+                document.getElementById('full-name').textContent = userData.fullName;
+                document.getElementById('email').textContent = userData.email;
+                document.getElementById('phone').textContent = userData.phone;
+                document.getElementById('address').textContent = userData.address;
+                document.getElementById('username').textContent = userData.username;
+                
+                // Hide input fields and show spans
+                document.getElementById('full-name').style.display = 'inline';
+                document.getElementById('edit-full-name').style.display = 'none';
+                
+                document.getElementById('email').style.display = 'inline';
+                document.getElementById('edit-email').style.display = 'none';
+                
+                document.getElementById('phone').style.display = 'inline';
+                document.getElementById('edit-phone').style.display = 'none';
+                
+                document.getElementById('address').style.display = 'inline';
+                document.getElementById('edit-address').style.display = 'none';
+                
+                document.getElementById('username').style.display = 'inline';
+                document.getElementById('edit-username').style.display = 'none';
+                
+                document.getElementById('password').style.display = 'inline';
+                document.getElementById('edit-password').style.display = 'none';
+                
+                // Hide save and cancel buttons
+                saveBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
+                
+                // Show edit buttons
+                editPersonalBtn.style.display = 'inline-block';
+                editAccountBtn.style.display = 'inline-block';
+                
+                // Show success toast
+                showToast('Profile updated successfully!');
+            }
+            
+            function cancelEditing() {
+                isEditing = false;
+                
+                // Hide input fields and show spans without saving
+                document.getElementById('full-name').style.display = 'inline';
+                document.getElementById('edit-full-name').style.display = 'none';
+                
+                document.getElementById('email').style.display = 'inline';
+                document.getElementById('edit-email').style.display = 'none';
+                
+                document.getElementById('phone').style.display = 'inline';
+                document.getElementById('edit-phone').style.display = 'none';
+                
+                document.getElementById('address').style.display = 'inline';
+                document.getElementById('edit-address').style.display = 'none';
+                
+                document.getElementById('username').style.display = 'inline';
+                document.getElementById('edit-username').style.display = 'none';
+                
+                document.getElementById('password').style.display = 'inline';
+                document.getElementById('edit-password').style.display = 'none';
+                
+                // Hide save and cancel buttons
+                saveBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
+                
+                // Show edit buttons
+                editPersonalBtn.style.display = 'inline-block';
+                editAccountBtn.style.display = 'inline-block';
+            }
+        }
+        
+        function setupProfilePicUpload() {
+            const fileInput = document.getElementById('file-input');
+            const profilePic = document.getElementById('profile-pic');
+            
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        profilePic.src = event.target.result;
+                        
+                        // Save the image to localStorage
+                        const userData = JSON.parse(localStorage.getItem('userData'));
+                        userData.profilePic = event.target.result;
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                        
+                        showToast('Profile picture updated!');
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
