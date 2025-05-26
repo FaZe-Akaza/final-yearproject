@@ -1,4 +1,3 @@
-// Login.js
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
@@ -18,21 +17,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Simple email validation
-            if (!email.includes('@') || !email.includes('.')) {
+            // Email validation
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 alert('Please enter a valid email address.');
                 return;
             }
 
-            // Check if user already exists
-            const existingUser = localStorage.getItem('user');
-            if (existingUser) {
-                if (confirm('An account already exists. Do you want to overwrite it?')) {
-                    registerUser(username, email, password);
-                }
-            } else {
-                registerUser(username, email, password);
+            // Get existing users or create empty array
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Check if username or email already exists
+            const userExists = users.some(user => 
+                user.username === username || user.email === email
+            );
+
+            if (userExists) {
+                alert('Username or email already registered.');
+                return;
             }
+
+            // Register new user
+            registerUser(username, email, password);
         });
     }
 
@@ -52,22 +57,29 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const savedUser = JSON.parse(localStorage.getItem('user'));
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                
+                // Find matching user (allows login with username or email)
+                const matchedUser = users.find(user => 
+                    (user.username === inputUsername || user.email === inputUsername) && 
+                    user.password === inputPassword
+                );
 
-                if (!savedUser) {
-                    showError('No registered user found. Please register first.', errorMessage);
+                if (!matchedUser) {
+                    showError('Invalid credentials.', errorMessage);
                     return;
                 }
 
-                if (inputUsername === savedUser.username && inputPassword === savedUser.password) {
-                    // Successful login
-                    alert('Login successful! Redirecting to homepage...');
-                    window.location.href = 'homepage.html';
-                } else {
-                    showError('Invalid username or password.', errorMessage);
-                }
+                // Store current user session (without password)
+                localStorage.setItem('currentUser', JSON.stringify({
+                    username: matchedUser.username,
+                    email: matchedUser.email
+                }));
+
+                alert('Login successful! Redirecting...');
+                window.location.href = 'homepage.html';
             } catch (err) {
-                showError('Error accessing user data. Please try again or register.', errorMessage);
+                showError('System error. Please try again.', errorMessage);
                 console.error('Login error:', err);
             }
         });
@@ -75,10 +87,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Helper function to register user
     function registerUser(username, email, password) {
-        const user = { username, email, password };
-        localStorage.setItem('user', JSON.stringify(user));
-        alert('Registration successful! Redirecting to login...');
-        window.location.href = 'login.html';
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        
+        const newUser = {
+            username,
+            email,
+            password, // Note: In production, always hash passwords!
+            createdAt: new Date().toISOString()
+        };
+
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        alert('Registration successful! You can now login.');
+        registerForm.reset(); // Clear the form
     }
 
     // Helper function to show errors
